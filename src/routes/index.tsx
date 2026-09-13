@@ -115,13 +115,19 @@ function Home() {
         .delete()
         .eq("opportunity_id", id)
         .eq("user_id", user.id);
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       toast("Removed from saved");
     } else {
       const { error } = await supabase
         .from("saved_opportunities")
         .insert({ opportunity_id: id, user_id: user.id });
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       toast.success("Saved for later");
     }
     queryClient.invalidateQueries({ queryKey: savedQuery.queryKey });
