@@ -111,10 +111,11 @@ function ProfilePage() {
       toast.error(error.message);
       return;
     }
-    const column = bucket === "resumes" ? "resume_url" : "avatar_url";
+    const patch =
+      bucket === "resumes" ? { resume_url: path } : { avatar_url: path };
     const { error: dbError } = await supabase
       .from("profiles")
-      .upsert({ id: user.id, [column]: path });
+      .upsert({ id: user.id, ...patch });
     if (dbError) {
       toast.error(dbError.message);
       return;
