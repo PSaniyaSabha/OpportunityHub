@@ -194,7 +194,7 @@ function Home() {
           <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
           <Select value={location} onValueChange={setLocation}>
             <SelectTrigger className="w-[190px] rounded-full">
-              <SelectValue placeholder="Location" />
+              <span>{location === "all" ? "All locations" : location}</span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All locations</SelectItem>
@@ -208,7 +208,7 @@ function Home() {
 
           <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
             <SelectTrigger className="w-[180px] rounded-full">
-              <SelectValue />
+              <span>{sort === "recent" ? "Newest first" : "Deadline soonest"}</span>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="recent">Newest first</SelectItem>
