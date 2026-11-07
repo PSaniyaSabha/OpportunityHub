@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { RefreshCw, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 import { OpportunityCard } from "@/components/opportunity-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,14 +46,18 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(opportunitiesQuery),
   component: Home,
 });
 
 type SortKey = "recent" | "deadline";
 
 function Home() {
-  const { data: opportunities = [] } = useQuery(opportunitiesQuery);
+  const {
+    data: opportunities = [],
+    isError: opportunitiesFailed,
+    isLoading: opportunitiesLoading,
+    refetch: refetchOpportunities,
+  } = useQuery(opportunitiesQuery);
   const { user } = useSession();
   const queryClient = useQueryClient();
   const savedQuery = savedIdsQuery(user?.id);
@@ -175,6 +180,28 @@ function Home() {
       </section>
 
       <main className="mx-auto max-w-6xl px-5 py-10">
+        {opportunitiesFailed ? (
+          <Alert variant="destructive" className="mb-8">
+            <AlertTitle>Opportunities couldn’t load</AlertTitle>
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-4">
+              <span>Check your connection and try again.</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void refetchOpportunities()}
+                disabled={opportunitiesLoading}
+              >
+                <RefreshCw aria-hidden="true" />
+                Try again
+              </Button>
+            </AlertDescription>
+          </Alert>
+        ) : opportunitiesLoading ? (
+          <p className="mb-8 text-sm text-muted-foreground" role="status">
+            Loading opportunities…
+          </p>
+        ) : null}
+
         <div className="flex flex-wrap gap-2">
           <CategoryChip active={category === "all"} onClick={() => setCategory("all")}>
             All
@@ -230,11 +257,11 @@ function Home() {
           </span>
         </div>
 
-        {filtered.length === 0 ? (
+        {filtered.length === 0 && !opportunitiesFailed && !opportunitiesLoading ? (
           <p className="mt-16 text-center text-muted-foreground">
             Nothing matches those filters yet. Try widening your search.
           </p>
-        ) : (
+        ) : filtered.length > 0 ? (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((o) => (
               <OpportunityCard
@@ -245,7 +272,7 @@ function Home() {
               />
             ))}
           </div>
-        )}
+        ) : null}
       </main>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
