@@ -257,11 +257,11 @@ function Home() {
           </span>
         </div>
 
-        {filtered.length === 0 ? (
+        {filtered.length === 0 && !opportunitiesFailed && !opportunitiesLoading ? (
           <p className="mt-16 text-center text-muted-foreground">
             Nothing matches those filters yet. Try widening your search.
           </p>
-        ) : (
+        ) : filtered.length > 0 ? (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((o) => (
               <OpportunityCard
