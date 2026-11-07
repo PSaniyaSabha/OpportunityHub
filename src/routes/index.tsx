@@ -272,7 +272,7 @@ function Home() {
               />
             ))}
           </div>
-        )}
+        ) : null}
       </main>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
